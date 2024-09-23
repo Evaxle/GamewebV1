@@ -51,6 +51,61 @@
              left: 50%;
              transform: translate(-50%, -50%);
          }
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #2e2e2e;
+            color: #ffffff;
+        }
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        h1 {
+            color: #000000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #333;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        th {
+            background-color: #444;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #5a5a5a;
+            color: #ffffff;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #6a6a6a;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #f5f5f5;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+        }
      </style>
  </head>
  <body>
@@ -67,11 +122,159 @@
 <div class="title">
  <h1 id="title1"></h1>
 </div>
-<div class="searchbox" id="searchbox">
- <input class="search" id="search" placeholder='Search Google or input a URL...' type='text'/>
 </div>
-<div class="icons">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+    }
+    
+    #update-log {
+        display: none;
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        width: 80%;
+        max-width: 900px;
+        background-color: #000000;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        padding: 20px;
+        z-index: 1000;
+    }
+
+    #update-log h2 {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    #update-log-columns {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px; /* Add some gap between columns */
+    }
+
+    .column {
+        width: 30%;
+        padding: 10px;
+    }
+
+    .column h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .column ul {
+        list-style-type: disc;
+        padding-left: 20px;
+    }
+
+    .column ul li {
+        margin-bottom: 10px;
+    }
+
+
+    /* Overlay when log is visible */
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: none;
+    }
+
+    /* Add HR between columns */
+    .hr-separator {
+        border: none;
+        border-left: 1px solid #ddd;
+        height: auto;
+        margin: 0 10px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+<div id="overlay"></div>
+
+<!-- Update Log UI -->
+<div id="update-log">
+    <h2>Update Log</h2>
+    <div id="update-log-columns">
+        <div class="column">
+            <h3>Basic</h3>
+            <ul>
+                
+            </ul>
+        </div>
+        <hr class="hr-separator">
+        <div class="column">
+            <h3>Paid</h3>
+            <ul>
+                
+            </ul>
+        </div>
+        <hr class="hr-separator">
+        <div class="column">
+            <h3>Beta Testers</h3>
+            <ul>
+                
+            </ul>
+        </div>
+    </div>
+    <button id="close-log">Close</button>
 </div>
+<!-- Button to Manually Show Update Log -->
+<button id="show-log">Show Update Log</button>
+
+<script>
+    // Function to get today's date in 'YYYY-MM-DD' format
+    function getTodayDate() {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    }
+
+    // Function to check if the update log should be shown automatically
+    function shouldShowUpdateLog() {
+        const lastSeenDate = localStorage.getItem('lastSeenUpdateLog');
+        const todayDate = getTodayDate();
+
+        // If the log hasn't been seen today, show it
+        if (lastSeenDate !== todayDate) {
+            showUpdateLog();
+            localStorage.setItem('lastSeenUpdateLog', todayDate);
+        }
+    }
+
+    // Function to show the update log
+    function showUpdateLog() {
+        document.getElementById('update-log').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';  // Show the overlay for dimming background
+    }
+
+    // Function to hide the update log
+    function closeUpdateLog() {
+        document.getElementById('update-log').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';  // Hide the overlay
+    }
+
+    // Event listener for the "Show Update Log" button
+    document.getElementById('show-log').addEventListener('click', showUpdateLog);
+
+    // Event listener for the "Close" button
+    document.getElementById('close-log').addEventListener('click', closeUpdateLog);
+
+    // Automatically check and show the update log if needed
+    shouldShowUpdateLog();
+</script>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap");
 
@@ -142,7 +345,7 @@ search.style.fontSize = fontsize2+"px";
 document.addEventListener("keypress", function onEvent(event) {
    if (event.key === "Enter") {
      var url=search.value;
-     window.location.href=window.location.href+"service/gateway?url=" + url;
+     window.location.href=window.location.href+"/service/gateway?url=" + url;
    }
 });
 </script>
@@ -313,10 +516,122 @@ document.addEventListener("keypress", function onEvent(event) {
       <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="Mainhub.html">Main Hub</a></li>
-        <li><a href="ultraviolet.html">Ultraviolet</a></li>
+        <li><a href="interstellar.html">Interstellar</a></li>
+        <li><a href="minigameweb.html">Mini gameweb</a></li>
         <!-- <li><a href="games.html">Games</a></li> -->
       </ul>
     </div>
+    <div id="developerboard">
+    <h1>User Management</h1>
+    <select id="userSelect"></select>
+    <div>
+        <label for="computerId">Computer ID:</label>
+        <input type="text" id="computerId">
+    </div>
+    <div>
+        <label for="userMode">User Mode:</label>
+        <input type="text" id="userMode">
+    </div>
+    <div>
+        <label for="userPin">User PIN:</label>
+        <input type="text" id="userPin">
+    </div>
+    <button id="saveButton">Save</button>
+    </div>
+    <script>
+        let db;
+
+        // Open IndexedDB
+        const request = indexedDB.open('UserDatabase', 1);
+        request.onupgradeneeded = (event) => {
+            db = event.target.result;
+            db.createObjectStore('users', { keyPath: 'username' });
+        };
+
+        request.onsuccess = (event) => {
+            db = event.target.result;
+            loadUsers();
+        };
+
+        function loadUsers() {
+            const transaction = db.transaction('users', 'readonly');
+            const store = transaction.objectStore('users');
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const users = request.result;
+                const userSelect = document.getElementById('userSelect');
+
+                // Clear existing options
+                userSelect.innerHTML = '';
+
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.username;
+                    option.textContent = user.username;
+                    userSelect.appendChild(option);
+                });
+            };
+        }
+
+        document.getElementById('userSelect').addEventListener('change', function() {
+            const selectedUser = this.value;
+            const transaction = db.transaction('users', 'readonly');
+            const store = transaction.objectStore('users');
+            const request = store.get(selectedUser);
+
+            request.onsuccess = () => {
+                const userData = request.result;
+                if (userData) {
+                    document.getElementById('computerId').value = userData.computerId || '';
+                    document.getElementById('userMode').value = userData.userMode || '';
+                    document.getElementById('userPin').value = userData.userPin || '';
+
+                    // Update local storage as well
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                }
+            };
+        });
+
+        document.getElementById('saveButton').addEventListener('click', () => {
+            const selectedUser = document.getElementById('userSelect').value;
+            const transaction = db.transaction('users', 'readwrite');
+            const store = transaction.objectStore('users');
+
+            const updatedUser = {
+                username: selectedUser,
+                computerId: document.getElementById('computerId').value,
+                userMode: document.getElementById('userMode').value,
+                userPin: document.getElementById('userPin').value,
+            };
+
+            store.put(updatedUser);
+
+            // Also update local storage
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            alert('User data updated successfully!');
+
+            // Reload users to refresh dropdown if needed
+            loadUsers();
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .user {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        textarea { width: 100%; height: 100px; margin-top: 10px; }
+    </style>
+</head>
+<body>
     <style>
         .button-container {
           position: fixed;
@@ -405,44 +720,50 @@ function applyDefaultMode() {
               }
       
               document.addEventListener('DOMContentLoaded', function () {
-                  const userMode = localStorage.getItem('userMode') || 'basic'; // Default to 'basic' mode if not set
-      
-                  // Function to set visibility based on user mode
-                  function setNavBarVisibility() {
-                      const navItems = document.querySelectorAll('.navbar ul li');
-                      navItems.forEach(item => item.style.display = 'none'); // Hide all items by default
-      
-                      if (userMode === 'developer') {
-                          // Show all items for developer
-                          navItems.forEach(item => item.style.display = 'block');
-                      } else if (userMode === 'beta') {
-                          // Show home, main hub, and ultraviolet for beta tester
-                          navItems[0].style.display = 'block'; // Home
-                          navItems[1].style.display = 'block'; // Main Hub
-                          navItems[2].style.display = 'block'; // Ultraviolet
-                      } else if (userMode === 'paid') {
-                          // Show home and main hub for paid user
-                          navItems[0].style.display = 'block'; // Home
-                          navItems[1].style.display = 'block'; // Main Hub
-                      } else if (userMode === 'basic') {
-                          // Show only home for basic user
-                          navItems[0].style.display = 'block'; // Home
-                      }
-                  }
-      
-                  setNavBarVisibility(); // Apply visibility settings
-              });
+    const userMode = localStorage.getItem('userMode') || 'basic'; // Default to 'basic' mode if not set
 
-              (function() {
-    // Check if userMode is set in local storage
-    const userMode = localStorage.getItem('userMode');
-    
-    // If userMode is not found, redirect to login page
-    if (!userMode) {
-        window.location.href = 'Pinsystem.html';
+    // Function to set visibility based on user mode
+    function setNavBarVisibility() {
+        const navItems = document.querySelectorAll('.navbar ul li');
+        navItems.forEach(item => item.style.display = 'none'); // Hide all items by default
+
+        if (userMode === 'developer') {
+            // Show all items for developer
+            navItems.forEach(item => item.style.display = 'block');
+            document.getElementById('developerboard').style.display = 'block'; // Show developer board
+        } else if (userMode === 'beta') {
+            // Show home, main hub, and ultraviolet for beta tester
+            navItems[0].style.display = 'block'; // Home
+            navItems[1].style.display = 'block'; // Main Hub
+            navItems[2].style.display = 'block'; // Ultraviolet
+            document.getElementById('developerboard').style.display = 'none'; // Hide developer board
+        } else if (userMode === 'paid') {
+            // Show home and main hub for paid user
+            navItems[0].style.display = 'block'; // Home
+            navItems[1].style.display = 'block'; // Main Hub
+            document.getElementById('developerboard').style.display = 'none'; // Hide developer board
+        } else if (userMode === 'basic') {
+            // Show only home for basic user
+            navItems[0].style.display = 'block'; // Home
+            document.getElementById('developerboard').style.display = 'none'; // Hide developer board
+        }
     }
-})();
 
+    setNavBarVisibility(); // Apply visibility settings
+});           
+();
+
+          </script>
+          <script>
+function checkUserPin() {
+    const userPin = localStorage.getItem('userPin');
+
+    if (!userPin) {
+        window.location.href = 'pinsystem.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', checkUserPin);
           </script>
             <button onclick="blank();">Open in about:blank</button>
       </div>
