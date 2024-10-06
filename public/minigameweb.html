@@ -72,7 +72,8 @@
     <!-- Navigation buttons -->
     <a href="index.html">Home</a>
     <a href="Mainhub.html">Mainhub</a>
-    <a href="interstellar.html">Interstellar</a>
+    <a href="freegameweb.html">Free Gameweb</a>
+    <li><a href="paidgameweb.html">Paid Gameweb</a></li>
 
     <!-- Iframe control -->
     <label for="iframeSrc">Iframe URL:</label>
@@ -127,3 +128,50 @@
 
 </body>
 </html>
+ <script>
+  // Function to check user mode and show/hide buttons
+function checkUserMode(currentUser) {
+    const homeBtn = document.getElementById('home');
+    const mainBtn = document.getElementById('main');
+    const freeBtn = document.getElementById('free');
+    const paidBtn = document.getElementById('paid');
+    const miniBtn = document.getElementById('mini');
+
+    // Hide all buttons initially
+    homeBtn.style.display = 'none';
+    mainBtn.style.display = 'none';
+    freeBtn.style.display = 'none';
+    paidBtn.style.display = 'none';
+    miniBtn.style.display = 'none';
+
+    // Show buttons based on user mode
+    if (currentUser.mode === 'basic') {
+        homeBtn.style.display = 'block';
+        freeBtn.style.display = 'block';
+        miniBtn.style.display = 'block';
+    } else if (currentUser.mode === 'paid') {
+        homeBtn.style.display = 'block';
+        mainBtn.style.display = 'block';
+        freeBtn.style.display = 'block';
+        paidBtn.style.display = 'block';
+        miniBtn.style.display = 'block';
+    } else if (currentUser.mode === 'beta tester') {
+        homeBtn.style.display = 'block';
+        mainBtn.style.display = 'block';
+        freeBtn.style.display = 'block';
+        paidBtn.style.display = 'block';
+        miniBtn.style.display = 'block';
+    } else if (currentUser.mode === 'developer') {
+        homeBtn.style.display = 'block';
+        mainBtn.style.display = 'block';
+        freeBtn.style.display = 'block';
+        paidBtn.style.display = 'block';
+        miniBtn.style.display = 'block';
+    }
+}
+
+// Example usage
+// Assuming currentUser is the object representing the logged-in user
+let currentUser = { mode: 'basic' }; // Replace this with the actual user object
+checkUserMode(currentUser);
+ </script>
