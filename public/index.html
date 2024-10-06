@@ -1,19 +1,4 @@
 <title>Gameweb V1</title>
- <script>
-        var secretCode = '';
-        var expectedCode = 'upupdowndownleftrightleftrightbastart';
-
-        function checkSecret(event) {
-            var char = String.fromCharCode(event.keyCode || event.which);
-            secretCode += char;
-            if (secretCode === expectedCode) {
-                window.location.href = 11111secret11111.html";
-                secretCode = '';
-            }
-        }
-
-        document.addEventListener('keypress', checkSecret);
-    </script>
 <style>
     ::-webkit-scrollbar {
         display: none;
@@ -514,13 +499,91 @@ document.addEventListener("keypress", function onEvent(event) {
   <body>
     <div class="navbar">
       <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="Mainhub.html">Main Hub</a></li>
-        <li><a href="interstellar.html">Interstellar</a></li>
-        <li><a href="minigameweb.html">Mini gameweb</a></li>
+        <li><a id="home" href="index.html">Home</a></li>
+        <li><a id="main" href="Mainhub.html">Main Hub</a></li>
+        <li><a id="free" href="freegameweb.html">Free Gameweb</a></li>
+        <li><a id="paid" href="paidgameweb.html">Paid Gameweb</a></li>
+        <li><a id="mini" href="minigameweb.html">Mini gameweb</a></li>
         <!-- <li><a href="games.html">Games</a></li> -->
       </ul>
     </div>
+    <script>
+        let db;
+
+        // Open IndexedDB
+        const request = indexedDB.open('UserDatabase', 1);
+        request.onupgradeneeded = (event) => {
+            db = event.target.result;
+            db.createObjectStore('users', { keyPath: 'username' });
+        };
+
+        request.onsuccess = (event) => {
+            db = event.target.result;
+            loadUsers();
+        };
+
+        function loadUsers() {
+            const transaction = db.transaction('users', 'readonly');
+            const store = transaction.objectStore('users');
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const users = request.result;
+                const userSelect = document.getElementById('userSelect');
+
+                // Clear existing options
+                userSelect.innerHTML = '';
+
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.username;
+                    option.textContent = user.username;
+                    userSelect.appendChild(option);
+                });
+            };
+        }
+
+        document.getElementById('userSelect').addEventListener('change', function() {
+            const selectedUser = this.value;
+            const transaction = db.transaction('users', 'readonly');
+            const store = transaction.objectStore('users');
+            const request = store.get(selectedUser);
+
+            request.onsuccess = () => {
+                const userData = request.result;
+                if (userData) {
+                    document.getElementById('computerId').value = userData.computerId || '';
+                    document.getElementById('userMode').value = userData.userMode || '';
+                    document.getElementById('userPin').value = userData.userPin || '';
+
+                    // Update local storage as well
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                }
+            };
+        });
+
+        document.getElementById('saveButton').addEventListener('click', () => {
+            const selectedUser = document.getElementById('userSelect').value;
+            const transaction = db.transaction('users', 'readwrite');
+            const store = transaction.objectStore('users');
+
+            const updatedUser = {
+                username: selectedUser,
+                computerId: document.getElementById('computerId').value,
+                userMode: document.getElementById('userMode').value,
+                userPin: document.getElementById('userPin').value,
+            };
+
+            store.put(updatedUser);
+
+            // Also update local storage
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            alert('User data updated successfully!');
+
+            // Reload users to refresh dropdown if needed
+            loadUsers();
+        });
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -623,53 +686,294 @@ function applyDefaultMode() {
                       script.src = "";
                       win.document.body.appendChild(script);
                   })();
-              }
-      
-              document.addEventListener('DOMContentLoaded', function () {
-    const userMode = localStorage.getItem('userMode') || 'basic'; // Default to 'basic' mode if not set
-
-    // Function to set visibility based on user mode
-    function setNavBarVisibility() {
-        const navItems = document.querySelectorAll('.navbar ul li');
-        navItems.forEach(item => item.style.display = 'none'); // Hide all items by default
-
-        if (userMode === 'developer') {
-            // Show all items for developer
-            navItems.forEach(item => item.style.display = 'block');
-            document.getElementById('developerboard').style.display = 'block'; // Show developer board
-        } else if (userMode === 'beta') {
-            // Show home, main hub, and ultraviolet for beta tester
-            navItems[0].style.display = 'block'; // Home
-            navItems[1].style.display = 'block'; // Main Hub
-            navItems[2].style.display = 'block'; // Ultraviolet
-            document.getElementById('developerboard').style.display = 'none'; // Hide developer board
-        } else if (userMode === 'paid') {
-            // Show home and main hub for paid user
-            navItems[0].style.display = 'block'; // Home
-            navItems[1].style.display = 'block'; // Main Hub
-            document.getElementById('developerboard').style.display = 'none'; // Hide developer board
-        } else if (userMode === 'basic') {
-            // Show only home for basic user
-            navItems[0].style.display = 'block'; // Home
-            document.getElementById('developerboard').style.display = 'none'; // Hide developer board
-        }
-    }
-
-    setNavBarVisibility(); // Apply visibility settings
-});           
+              }          
 ();
 
           </script>
-          <script>
-function checkUserPin() {
-    const userPin = localStorage.getItem('userPin');
-
-    if (!userPin) {
-        window.location.href = 'pinsystem.html';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', checkUserPin);
-          </script>
             <button onclick="blank();">Open in about:blank</button>
       </div>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>User Management Dashboard</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  padding: 20px;
+              }
+              table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-top: 20px;
+              }
+              th, td {
+                  padding: 10px;
+                  border: 1px solid #ddd;
+                  text-align: left;
+              }
+              th {
+                  background-color: #f4f4f4;
+              }
+              .container {
+                  max-width: 600px;
+                  margin: 0 auto;
+              }
+              .search-container {
+                  margin-bottom: 20px;
+              }
+              nav ul {
+                  list-style-type: none;
+                  padding: 0;
+              }
+              nav ul li {
+                  display: inline;
+                  margin-right: 15px;
+              }
+          </style>
+      </head>
+      <body>
+        <div id="developerdashboard">
+          <div class="container">
+              <h1>User Management Dashboard</h1>
+              <p>Manage users, search for a user by PIN, and change their mode.</p>
+              <!-- Search User Section -->
+              <div class="search-container">
+                  <input type="text" id="searchPin" placeholder="Enter PIN to search">
+                  <button onclick="searchUser()">Search User</button>
+              </div>
+      
+              <!-- Table to Display Current User -->
+              <h2>Current User</h2>
+              <table>
+                  <thead>
+                      <tr>
+                          <th>PIN</th>
+                          <th>Mode</th>
+                      </tr>
+                  </thead>
+                  <tbody id="currentUserTableBody">
+                      <!-- Current user will be dynamically populated here -->
+                  </tbody>
+              </table>
+      
+              <!-- Table to Display All Users -->
+              <h2>All Users</h2>
+              <table>
+                  <thead>
+                      <tr>
+                          <th>PIN</th>
+                          <th>Mode</th>
+                          <th>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody id="userTableBody">
+                      <!-- Users will be dynamically populated here -->
+                  </tbody>
+              </table>
+            </div>
+          </div>
+      
+          <script>
+              // Function to generate a new random PIN
+              function generatePin() {
+                  return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit PIN
+              }
+      
+              // Function to create a new user with PIN and default mode
+              function createUser() {
+                  let users = JSON.parse(localStorage.getItem('users')) || [];
+      
+                  // Generate a new PIN for the user
+                  let newPin = generatePin();
+                  let newUser = { pin: newPin, mode: 'basic' }; // Default mode is 'basic'
+      
+                  // Save the new user's pin and mode
+                  users.push(newUser);
+                  localStorage.setItem('users', JSON.stringify(users)); // Update localStorage
+      
+                  alert(`A new user has been created with PIN: ${newPin}`);
+                  return newUser;
+              }
+      
+              // Function to display the current user
+              function displayCurrentUser(currentUser) {
+                  let currentUserTable = document.getElementById('currentUserTableBody');
+                  currentUserTable.innerHTML = ''; // Clear existing rows
+      
+                  let row = document.createElement('tr');
+                  let pinCell = document.createElement('td');
+                  pinCell.textContent = currentUser.pin;
+      
+                  let modeCell = document.createElement('td');
+                  modeCell.textContent = currentUser.mode;
+      
+                  row.appendChild(pinCell);
+                  row.appendChild(modeCell);
+                  currentUserTable.appendChild(row);
+              }
+      
+              // Function to display all users in the UI
+              function displayUsers() {
+                  let users = JSON.parse(localStorage.getItem('users')) || [];
+                  let userTable = document.getElementById('userTableBody');
+                  
+                  // Clear existing table rows
+                  userTable.innerHTML = '';
+      
+                  // Loop through all users and create table rows for each
+                  users.forEach((user) => {
+                      let row = document.createElement('tr');
+                      
+                      // Create columns for PIN and Mode
+                      let pinCell = document.createElement('td');
+                      pinCell.textContent = user.pin;
+                      
+                      let modeCell = document.createElement('td');
+                      let modeSelect = document.createElement('select');
+                      ['basic', 'paid', 'beta tester', 'developer'].forEach(mode => {
+                          let option = document.createElement('option');
+                          option.value = mode;
+                          option.textContent = mode;
+                          if (user.mode === mode) {
+                              option.selected = true;
+                          }
+                          modeSelect.appendChild(option);
+                      });
+      
+                      modeCell.appendChild(modeSelect);
+      
+                      // Create a button to save the mode change
+                      let actionCell = document.createElement('td');
+                      let saveButton = document.createElement('button');
+                      saveButton.textContent = 'Save Mode';
+                      saveButton.onclick = () => {
+                          user.mode = modeSelect.value; // Update user mode
+                          localStorage.setItem('users', JSON.stringify(users)); // Update localStorage
+                          alert(`User mode updated to: ${user.mode}`);
+                      };
+      
+                      actionCell.appendChild(saveButton);
+                      row.appendChild(pinCell);
+                      row.appendChild(modeCell);
+                      row.appendChild(actionCell);
+                      userTable.appendChild(row);
+                  });
+              }
+      
+              // Function to search for a specific user by PIN
+              function searchUser() {
+                  let searchPin = document.getElementById('searchPin').value;
+                  let users = JSON.parse(localStorage.getItem('users')) || [];
+                  
+                  // Clear existing table rows
+                  let userTable = document.getElementById('userTableBody');
+                  userTable.innerHTML = '';
+      
+                  // Find the user with the given PIN
+                  let result = users.find(user => user.pin === searchPin);
+      
+                  if (result) {
+                      // Create a row for the found user
+                      let row = document.createElement('tr');
+                      
+                      let pinCell = document.createElement('td');
+                      pinCell.textContent = result.pin;
+      
+                      let modeCell = document.createElement('td');
+                      let modeSelect = document.createElement('select');
+                      ['basic', 'paid', 'beta tester', 'developer'].forEach(mode => {
+                          let option = document.createElement('option');
+                          option.value = mode;
+                          option.textContent = mode;
+                          if (result.mode === mode) {
+                              option.selected = true;
+                          }
+                          modeSelect.appendChild(option);
+                      });
+      
+                      modeCell.appendChild(modeSelect);
+      
+                      // Create a button to save the mode change
+                      let actionCell = document.createElement('td');
+                      let saveButton = document.createElement('button');
+                      saveButton.textContent = 'Save Mode';
+                      saveButton.onclick = () => {
+                          result.mode = modeSelect.value; // Update user mode
+                          localStorage.setItem('users', JSON.stringify(users)); // Update localStorage
+                          alert(`User mode updated to: ${result.mode}`);
+                      };
+      
+                      actionCell.appendChild(saveButton);
+                      row.appendChild(pinCell);
+                      row.appendChild(modeCell);
+                      row.appendChild(actionCell);
+                      userTable.appendChild(row);
+                  } else {
+                      alert('No user found with that PIN.');
+                  }
+              }
+      
+              // Function to check user mode and show/hide buttons
+              function checkUserMode(currentUser) {
+                  const homeBtn = document.getElementById('home');
+                  const mainBtn = document.getElementById('main');
+                  const freeBtn = document.getElementById('free');
+                  const paidBtn = document.getElementById('paid');
+                  const miniBtn = document.getElementById('mini');
+                  const devdashboard = document.getElementById('developerdashboard');
+      
+                  // Hide all buttons initially
+                  homeBtn.style.display = 'none';
+                  mainBtn.style.display = 'none';
+                  freeBtn.style.display = 'none';
+                  paidBtn.style.display = 'none';
+                  miniBtn.style.display = 'none';
+      
+                  // Show buttons based on user mode
+                  if (currentUser.mode === 'basic') {
+                      homeBtn.style.display = 'block';
+                      freeBtn.style.display = 'block';
+                      miniBtn.style.display = 'block';
+                      devdashboard.style.display = 'none'
+                  } else if (currentUser.mode === 'paid') {
+                      homeBtn.style.display = 'block';
+                      mainBtn.style.display = 'block';
+                      freeBtn.style.display = 'block';
+                      paidBtn.style.display = 'block';
+                      miniBtn.style.display = 'block';
+                      devdashboard.style.display = 'none'
+                  } else if (currentUser.mode === 'beta tester') {
+                      homeBtn.style.display = 'block';
+                      mainBtn.style.display = 'block';
+                      freeBtn.style.display = 'block';
+                      paidBtn.style.display = 'block';
+                      miniBtn.style.display = 'block';
+                      devdashboard.style.display = 'none'
+                    } else if (currentUser.mode === 'developer') {
+                      homeBtn.style.display = 'block';
+                      mainBtn.style.display = 'block';
+                      freeBtn.style.display = 'block';
+                      paidBtn.style.display = 'block';
+                      miniBtn.style.display = 'block';
+                      devdashboard.style.display = 'block'
+                  }
+              }
+      
+              // Initialize the application
+              window.onload = function () {
+                  let users = JSON.parse(localStorage.getItem('users')) || [];
+                  if (users.length === 0) {
+                      createUser(); // Create a default user if none exist
+                  }
+                  displayUsers();
+                  let currentUser = users[0]; // Assume the first user is the current user for demonstration
+                  displayCurrentUser(currentUser);
+                  checkUserMode(currentUser); // Check user mode and show/hide buttons
+              };
+              
+          </script>
+      </body>
+      </html>
+      
