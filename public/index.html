@@ -1,25 +1,4 @@
 <title>Gameweb V1</title>
-<!-- Firebase App (the core Firebase SDK) -->
-<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-<!-- Firebase Firestore -->
-<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
-<script>
-    // Initialize Firebase
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Initialize Firestore
-const db = firebase.firestore();
-</script>
 <style>
     ::-webkit-scrollbar {
         display: none;
@@ -883,70 +862,59 @@ function applyDefaultMode() {
                   });
               }
       
-         // Function to search for a specific user by PIN using Firestore
-function searchUser() {
-    let searchPin = document.getElementById('searchPin').value;
-
-    // Query Firestore for the user
-    db.collection("users").where("pin", "==", searchPin)
-        .get()
-        .then((querySnapshot) => {
-            // Clear existing table rows
-            let userTable = document.getElementById('userTableBody');
-            userTable.innerHTML = '';
-
-            if (querySnapshot.empty) {
-                alert('No user found with that PIN.');
-                return;
-            }
-
-            // Loop through the results and display user info
-            querySnapshot.forEach((doc) => {
-                let result = doc.data();
-                let row = document.createElement('tr');
-
-                let pinCell = document.createElement('td');
-                pinCell.textContent = result.pin;
-
-                let modeCell = document.createElement('td');
-                let modeSelect = document.createElement('select');
-                ['basic', 'paid', 'beta tester', 'developer'].forEach(mode => {
-                    let option = document.createElement('option');
-                    option.value = mode;
-                    option.textContent = mode;
-                    if (result.mode === mode) {
-                        option.selected = true;
-                    }
-                    modeSelect.appendChild(option);
-                });
-
-                modeCell.appendChild(modeSelect);
-
-                // Create a button to save the mode change
-                let actionCell = document.createElement('td');
-                let saveButton = document.createElement('button');
-                saveButton.textContent = 'Save Mode';
-                saveButton.onclick = () => {
-                    // Update Firestore
-                    db.collection("users").doc(doc.id).update({
-                        mode: modeSelect.value
-                    }).then(() => {
-                        alert(`User mode updated to: ${modeSelect.value}`);
-                    });
-                };
-
-                actionCell.appendChild(saveButton);
-                row.appendChild(pinCell);
-                row.appendChild(modeCell);
-                row.appendChild(actionCell);
-                userTable.appendChild(row);
-            });
-        })
-        .catch((error) => {
-            console.error("Error getting documents: ", error);
-        });
-}
-
+              // Function to search for a specific user by PIN
+              function searchUser() {
+                  let searchPin = document.getElementById('searchPin').value;
+                  let users = JSON.parse(localStorage.getItem('users')) || [];
+                  
+                  // Clear existing table rows
+                  let userTable = document.getElementById('userTableBody');
+                  userTable.innerHTML = '';
+      
+                  // Find the user with the given PIN
+                  let result = users.find(user => user.pin === searchPin);
+      
+                  if (result) {
+                      // Create a row for the found user
+                      let row = document.createElement('tr');
+                      
+                      let pinCell = document.createElement('td');
+                      pinCell.textContent = result.pin;
+      
+                      let modeCell = document.createElement('td');
+                      let modeSelect = document.createElement('select');
+                      ['basic', 'paid', 'beta tester', 'developer'].forEach(mode => {
+                          let option = document.createElement('option');
+                          option.value = mode;
+                          option.textContent = mode;
+                          if (result.mode === mode) {
+                              option.selected = true;
+                          }
+                          modeSelect.appendChild(option);
+                      });
+      
+                      modeCell.appendChild(modeSelect);
+      
+                      // Create a button to save the mode change
+                      let actionCell = document.createElement('td');
+                      let saveButton = document.createElement('button');
+                      saveButton.textContent = 'Save Mode';
+                      saveButton.onclick = () => {
+                          result.mode = modeSelect.value; // Update user mode
+                          localStorage.setItem('users', JSON.stringify(users)); // Update localStorage
+                          alert(`User mode updated to: ${result.mode}`);
+                      };
+      
+                      actionCell.appendChild(saveButton);
+                      row.appendChild(pinCell);
+                      row.appendChild(modeCell);
+                      row.appendChild(actionCell);
+                      userTable.appendChild(row);
+                  } else {
+                      alert('No user found with that PIN.');
+                  }
+              }
+      
               // Function to check user mode and show/hide buttons
               function checkUserMode(currentUser) {
                   const homeBtn = document.getElementById('home');
