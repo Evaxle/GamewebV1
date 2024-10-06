@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini gameweb</title>
+  <title>Gameweb</title>
   <style>
     * {
       margin: 0;
@@ -70,15 +70,11 @@
 <div class="iframe-container">
   <div class="top-bar">
     <!-- Navigation buttons -->
-    <a href="index.html">Home</a>
-    <a href="Mainhub.html">Mainhub</a>
-    <a href="freegameweb.html">Free Gameweb</a>
-    <li><a href="paidgameweb.html">Paid Gameweb</a></li>
-
-    <!-- Iframe control -->
-    <label for="iframeSrc">Iframe URL:</label>
-    <input type="text" id="iframeSrc" placeholder="Enter URL">
-    <button onclick="changeIframeSrc()">Change Src</button>
+    <li><a id="home" href="index.html">Home</a></li>
+        <li><a id="main" href="Mainhub.html">Main Hub</a></li>
+        <li><a id="free" href="freegameweb.html">Free Gameweb</a></li>
+        <li><a id="paid" href="paidgameweb.html">Paid Gameweb</a></li>
+        <li><a id="mini" href="minigameweb.html">Mini gameweb</a></li>
 
     <!-- FPS control -->
     <label for="fpsInput">FPS:</label>
@@ -89,18 +85,10 @@
     <button onclick="toggleIframeFullScreen()">Fullscreen</button>
   </div>
 
-  <iframe id="iframeContent" src=""></iframe>
+  <iframe id="iframeContent" src="https://rrrcgx-8080.csb.app/"></iframe>
 </div>
 
 <script>
-  function changeIframeSrc() {
-    const iframe = document.getElementById('iframeContent');
-    const newSrc = document.getElementById('iframeSrc').value;
-    if (newSrc) {
-      iframe.src = newSrc.startsWith('http') ? newSrc : `https://${newSrc}`;
-    }
-  }
-
   function toggleIframeFullScreen() {
     const iframe = document.getElementById('iframeContent');
     if (iframe.requestFullscreen) {
@@ -128,7 +116,7 @@
 
 </body>
 </html>
- <script>
+<script>
   // Function to check user mode and show/hide buttons
 function checkUserMode(currentUser) {
     const homeBtn = document.getElementById('home');
